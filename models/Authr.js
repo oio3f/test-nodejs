@@ -40,16 +40,7 @@ const AuthorSchema = new mongoose.Schema(
 
 /* genrateToken; */
 
-AuthorSchema.methods.genrateToken = function () {
-  return jwt.sign(
-    {
-      id: this._id,
-      username: this.username,
-      isAdmin: this.isAdmin,
-    },
-    process.env.SECRET_KEY
-  );
-};
+
 
 /* // genrateToken  // */
 

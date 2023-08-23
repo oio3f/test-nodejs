@@ -3,7 +3,6 @@ const router = express.Router();
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 
-
 const {
   User,
   validateUserLogin,
@@ -30,13 +29,13 @@ router.post(
       } else {
         var salt = bcrypt.genSaltSync(10);
         b.password = bcrypt.hashSync(b.password, salt);
-        const Acount = await new User({
+        const account = await new User({
           email: b.email,
           username: b.username,
           password: b.password,
         });
-        const result = await Acount.save();
-        const token = User.genrateToken();
+        const result = await account.save();
+        const token = await account.generateToken(); // Use account, not Acount
         const { password, _id, ...other } = result._doc;
         res.status(201).json({ _id, ...other, token });
       }
@@ -61,14 +60,13 @@ router.post(
 
       const user = await User.findOne({
         email: b.email,
-      }); /* .select("password"); */
+      });
 
       if (user) {
         const verification = bcrypt.compareSync(b.password, user.password);
 
         if (verification) {
-          const token = User.genrateToken();
-
+          const token = user.generateToken();
           const { password, _id, ...other } = user._doc;
           const responseObj = { _id, /* ...other, */ token };
           res.status(200).json(responseObj);
