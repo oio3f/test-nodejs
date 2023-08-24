@@ -1,0 +1,86 @@
+
+/**
+ * @desc Login User
+ * @route /login
+ * @method POST
+ * @access Public
+ **/
+router.post(
+  "/login",
+  asyncHandler(async (req, res) => {
+    validateUserLogin(req.body);
+    if (error) {
+      res.status(400).send(error.details[0].message);
+    } else {
+      const b = req.body;
+      const find = User.findOne({ email: b.email });
+      if (find) {
+        const verification = find.password == b.password;
+        if (verification) {
+          res.status(200).json(find);
+        } else {
+          res.status(401).json({ message: "the password inccroect" });
+        }
+      } else {
+        res.status(400).json({ message: "not found acount of that" });
+      }
+
+      const Acount = await new User({
+        email: b.email,
+        username: b.username,
+        password: b.password,
+      });
+      const result = await Acount.save();
+      res.status(201).json(result);
+    }
+  })
+);
+
+/**
+ * @desc Update User
+ * @route /update
+ * @method PUT
+ * @access Public
+ **/
+router.put(
+  "/update/:id",
+  asyncHandler(async (req, res) => {
+    const b = req.body;
+    validateUserUpdate(b);
+    if (error) {
+      res.status(400).send(error.details[0].message);
+    } else {
+      const find = await User.findById(b.id);
+      if (find) {
+        const update = await User.findByIdAndUpdate(
+          b.id,
+          {
+            $set: {
+              email: b.email,
+              username: b.username,
+              password: b.password,
+            },
+          },
+          { new: true }
+        );
+        res.status(200).json(update);
+      } else {
+      }
+    }
+  })
+);
+
+/**
+ * @desc Delete User
+ * @route /delete
+ * @method DELETE
+ * @access Public
+ **/
+//to do
+/* router.delete('/delete/:id',
+    asyncHandler(
+        async (req,res)=>{
+            const id = req.params.id
+        }
+    )
+) */
